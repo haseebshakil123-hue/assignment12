@@ -1,0 +1,46 @@
+| Operation | Suggested verdict | Evidence / reason |
+|---|---|---|
+| `cleaned_df = df.copy()` | KEEP | Original DataFrame remains available for comparison; working copy begins with 97 rows. |
+| `drop_duplicates()` | KEEP, with documented scope | The source has one exact duplicate pair (indices 8 and 96). One copy is removed, leaving 96 rows. |
+| Convert `date` with `pd.to_datetime` | KEEP | Dates are ISO-formatted and convert to datetime without creating missing dates. |
+| Remove commas from `price` | KEEP, but verify | `1,250` becomes numeric `1250`. This is a representation conversion; the unusually high amount remains flagged for review. |
+| Convert `price` with `pd.to_numeric` | KEEP | Price becomes numeric; the original missing price remains missing. |
+| Add missing-price flag | KEEP | Makes the missing observation visible without filling it. |
+| Add `price > 1000` review flag | MODIFY / use as a review rule only | Flags both 1250 and 9999. A threshold is not proof of an error; both values need source checking. |
+| Automatically rename `oil b` | REJECT | There is insufficient evidence to confirm the intended product. Preserve the original label and flag it. |
+| Automatically delete 9999 or 1250 | REJECT | Extreme values must not be removed without source evidence or a justified rule. |
+| Fill the missing price with a mean/median | REJECT | No verified source value is available; imputation would invent a value for this audit task. |
+
+| Check | Before | After |
+|---|---:|---:|
+| Rows | 97 | 96 |
+| Columns | 6 | 8 |
+| Exact duplicate rows | 1 duplicate beyond first occurrence | 0 |
+| Missing price values | 1 | 1 |
+| Numeric price count | 96 | 95 |
+| Maximum numeric price | 9999 | 9999 |
+| `1,250` representation | Text with comma | Numeric 1250 |
+| `oil b` label | 1 | 1 (retained unchanged) |
+
+| Statistic | Before conversion (comma removed for analysis) | After cleaning |
+|---|---:|---:|
+| Count | 96 | 95 |
+| Mean | 315.4583 | 317.7316 |
+| Standard deviation | 1007.5615 | 1012.6592 |
+| Minimum | 99.5 | 99.5 |
+| 25% | 142.25 | 151.0 |
+| Median | 200.0 | 200.0 |
+| 75% | 304.0 | 304.0 |
+| Maximum | 9999 | 9999 |
+
+Row-removal audit
+The only removed row is index 96, an exact duplicate of index 8. No other original row is removed by this workflow. The code compares original indices to cleaned indices in the notebook.
+Reflection – complete after reviewing the actual AI response and notebook run
+1. Which of my decisions differed from the AI's?
+[Write the actual difference. For example, compare whether AI wanted to replace oil b or delete extreme prices with your evidence-based decision to flag them.]
+2. Which decision was better supported, and why?
+[Use evidence from the before-and-after tables and the source rows. Do not simply say that one side was better; explain why.]
+3. What might I have missed working alone?
+[State what the AI helped you notice, if anything, and whether its suggestions needed correction.]
+Final audit statement
+[After running the notebook, confirm whether every retained cleaning operation is understood and whether any valid observation or value was changed without explanation.]
